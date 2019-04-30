@@ -1,0 +1,24 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t shulme/ott-fib-test -f ./client/Dockerfile.dev ./client
+
+# Primary test script running area
+# Travis will assume failure on any non 0 exit codes
+script:
+  - docker run shulme/ott-fib-test npm test -- --coverage
+
+after_success:
+  - docker build -t shulme/ott-fib-client ./client
+  - docker build -t shulme/ott-fib-nginx ./nginx
+  - docker build -t shulme/ott-fib-server ./server
+  - docker build -t shulme/ott-fib-worker ./worker
+  # Log in to docker hub
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Push built images to docker hub
+  - docker push shulme/ott-fib-client
+  - docker push shulme/ott-fib-nginx
+  - docker push shulme/ott-fib-server
+  - docker push shulme/ott-fib-worker

@@ -32,6 +32,7 @@ services:
       - PGPASSWORD=postgres_password
       - PGPORT=5432
   client:
+    restart: always
     build:
       dockerfile: Dockerfile.dev
       context: ./client
